@@ -1,0 +1,14 @@
+#!/bin/bash
+# Usage:
+# nagios_host_enable <host_name>
+#
+source ./nagios_library.sh
+export HOSTLIST=`grep 'host_name' "$HOSTFILE" | awk '{print $3}' | sort | uniq | grep -i -P "$1"`
+
+for HOST in $HOSTLIST
+do
+  now=`date +%s`
+  echo "Enabling $HOST"
+  /usr/bin/printf "[%lu] ENABLE_HOST_NOTIFICATIONS;$HOST\n" $now > $commandfile
+done
+IFS=$SAVEIFS

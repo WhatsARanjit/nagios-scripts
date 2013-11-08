@@ -1,0 +1,14 @@
+#!/bin/bash
+# Usage:
+# nagios_host_ack <host_name> <username>
+#
+source ./nagios_library.sh
+export HOSTLIST=`grep 'host_name' "$HOSTFILE" | awk '{print $3}' | sort | uniq | grep -i -P "$1"`
+
+for HOST in $HOSTLIST
+do
+  now=`date +%s`
+  echo "Acknowledging $HOST"
+  /usr/bin/printf "[%lu] ACKNOWLEDGE_HOST_PROBLEM;$HOST;1;0;0;$2;Script Ack\n" $now > $commandfile
+done
+IFS=$SAVEIFS

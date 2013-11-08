@@ -1,0 +1,11 @@
+#!/bin/bash
+# Usage:
+# nagios_service_ack <host_name> <service_name> <username>
+#
+source ./nagios_library.sh
+now=`date +%s`
+echo "Acknowledging $1 $2"
+/usr/bin/printf "[%lu] ACKNOWLEDGE_SVC_PROBLEM;$1;$2;1;0;0;$3;Script Ack\n" $now > $commandfile
+IFS=$SAVEIFS
+
+

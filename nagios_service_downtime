@@ -1,0 +1,28 @@
+#!/bin/bash
+# Usage:
+# nagios_service_downtime <host_name> <service_name> <start_time_epoch> <end_time_epoch>
+#
+source ./nagios_library.sh
+export SERVICELIST=`grep 'service_description' "$SERVICEFILE" | awk '{print $3}' | sort | uniq | grep -i -P "$2"`
+export HOSTLIST=`grep 'host_name' "$HOSTFILE" | awk '{print $3}' | sort | uniq | grep -i -P "$1"`
+
+starttime=`date --date "$3" +%s 2> /dev/null`
+if [ "$?" != 0 ]; then echo "ERROR: $3 is not a valid date"; exit 1; fi
+endtime=`date --date "$4" +%s 2> /dev/null`
+if [ "$?" != 0 ]; then echo "ERROR: $4 is not a valid date"; exit 1; fi
+
+humanstart=`date --date "$3" 2> /dev/null`
+humanend=`date --date "$4" 2> /dev/null`
+
+for HOST in $HOSTLIST
+do
+  for SERVICE in $SERVICELIST
+  do
+    now=`date +%s`
+    echo "Scheduling downtime for $HOST: $SERVICE from $humanstart to $humanend"
+    /usr/bin/printf "[%lu] SCHEDULE_SVC_DOWNTIME;$HOST;$SERVICE;$starttime;$endtime;1;0;0;$USER;Scripted Downtime $now" > $commandfile
+  done
+done
+IFS=$SAVEIFS
+
+

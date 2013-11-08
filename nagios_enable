@@ -1,0 +1,20 @@
+#!/bin/bash
+# Usage:
+# nagios_enable <host_name> <service_name>
+#
+source ./nagios_library.sh
+export SERVICELIST=`grep 'service_description' "$SERVICEFILE" | awk '{print $3}' | sort | uniq | grep -i -P "$2"`
+export HOSTLIST=`grep 'host_name' "$HOSTFILE" | awk '{print $3}' | sort | uniq | grep -i -P "$1"`
+
+for HOST in $HOSTLIST
+do
+  for SERVICE in $SERVICELIST
+  do
+    now=`date +%s`
+    echo "Enabling $HOST $SERVICE"
+    /usr/bin/printf "[%lu] ENABLE_SVC_NOTIFICATIONS;$HOST;$SERVICE\n" $now > $commandfile
+  done
+done
+IFS=$SAVEIFS
+
+
